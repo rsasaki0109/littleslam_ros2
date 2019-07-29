@@ -17,9 +17,6 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(Eigen3)
 find_package (PCL 1.8 REQUIRED)
 
-set(PCL_INCLUDE_DIRS /usr/include/pcl-1.8) 
-set(EIGEN3_INCLUDE_DIRS /usr/include/eigen3) 
-
 add_subdirectory(./src/LittleSLAM/framework)
 add_subdirectory(./src/LittleSLAM/hook)
 add_subdirectory(./src/LittleSLAM/cui)
