@@ -130,21 +130,21 @@ void Littleslam::broadcast_littleslam()
             nav_msgs::msg::Path path;
             path.header.frame_id = "map";
             for(auto p : map->poses) {
-                geometry_msgs::msg::PoseStamped pose_s;
-                pose_s.pose.position.x = p.tx;
-                pose_s.pose.position.y = p.ty;
-                pose_s.pose.position.z = 0;
+                geometry_msgs::msg::PoseStamped pose;
+                pose.pose.position.x = p.tx;
+                pose.pose.position.y = p.ty;
+                pose.pose.position.z = 0;
                 tf2::Quaternion quat_tf;
                 quat_tf.setRPY(0.0, 0.0, DEG2RAD(p.th));
                 geometry_msgs::msg::Quaternion quat_msg;
                 quat_msg = tf2::toMsg(quat_tf);
-                pose_s.pose.orientation = quat_msg;
-                path.poses.push_back(pose_s);
+                pose.pose.orientation = quat_msg;
+                path.poses.push_back(pose);
                 if(p.tx == map->lastPose.tx && 
                    p.ty == map->lastPose.ty && 
                    p.th == map->lastPose.th){
-                    pose_s.header.frame_id = "map";
-                    current_pose_pub_->publish(pose_s);
+                    pose.header.frame_id = "map";
+                    current_pose_pub_->publish(pose);
                    }
             }
             
