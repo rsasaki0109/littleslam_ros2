@@ -24,8 +24,8 @@ pub
 - nav_msgs::msg::PoseStamped ("current_pose")
 
 # Demo
-
-![demo](./littleslam.gif)  
+data:[ros.org Introduction to Working With Laser Scanner Data](http://wiki.ros.org/laser_pipeline/Tutorials/IntroductionToWorkingWithLaserScannerData)
+![demo](./littleslam.png)  
 
 # Reference  
 [Masahiro Tomono,『introduction to SLAM』](https://www.ohmsha.co.jp/book/9784274221668/)(in japanese)  
