@@ -55,11 +55,8 @@ extern "C" {
 #include "tf2_ros/transform_listener.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
-
 #include "SlamFrontEnd.h"
 #include "FrameworkCustomizer.h"
-
-
 
 namespace littleslam_ros2
 {
@@ -77,17 +74,15 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
 
-  SlamFrontEnd *sf = new SlamFrontEnd();
-  FrameworkCustomizer fc;
+  SlamFrontEnd *sf_ = new SlamFrontEnd();
+  FrameworkCustomizer fc_;
 
-  bool make_scan2d(Scan2D &out_scan, const sensor_msgs::msg::LaserScan::SharedPtr scan);
-  void scan_cb(const sensor_msgs::msg::LaserScan::SharedPtr scan);
+  bool make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::SharedPtr scan_msg);
   void broadcast_littleslam();
 
-  PointCloudMap *map;
-  sensor_msgs::msg::PointCloud2 cloud;
-
-  bool use_odom; 
+  PointCloudMap *map_;
+  
+  bool use_odom_; 
 };
 
 } // namespace littleslam_ros2

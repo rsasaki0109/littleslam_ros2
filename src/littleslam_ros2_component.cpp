@@ -13,9 +13,7 @@
 #include <iostream>
 #include <sstream>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
-
-boost::circular_buffer<Scan2D> scan_buf(1000);
+boost::circular_buffer<Scan2D> scan_buf(10000);
 
 using namespace std::chrono_literals;
 
@@ -26,17 +24,25 @@ Littleslam::Littleslam()
 : Node("littleslam")
 { 
 
-    use_odom=false;
+    use_odom_ = false;
 
-    fc.setSlamFrontEnd(sf);
-    fc.makeFramework();
-    if(use_odom){
-        fc.customizeI();
+    fc_.setSlamFrontEnd(sf_);
+    fc_.makeFramework();
+    if(use_odom_){
+        fc_.customizeI();
     }
-    else fc.customizeG();
+    else fc_.customizeG();
+
+    auto scan_callback =
+        [this](const typename sensor_msgs::msg::LaserScan::SharedPtr msg) -> void
+        {
+            Scan2D scan2d;
+            if (make_scan2d(scan2d, msg)) scan_buf.push_back(scan2d);
+        };
     
-    laser_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-    "scan", 100, std::bind(&Littleslam::scan_cb, this, std::placeholders::_1));
+    laser_sub_  = 
+            create_subscription<sensor_msgs::msg::LaserScan>("scan", 100,
+                scan_callback);
 
     icp_map_pub_ = create_publisher<sensor_msgs::msg::PointCloud2>("icp_map", 10); 
 
@@ -44,14 +50,13 @@ Littleslam::Littleslam()
 
     current_pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("curent_pose", 10);
 
-    timer_ = create_wall_timer(0.001s, std::bind(&Littleslam::broadcast_littleslam, this));
+    timer_ = create_wall_timer(0.1s, std::bind(&Littleslam::broadcast_littleslam, this));
 }
-
 
 bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::SharedPtr scan)
 {   
 
-    if(use_odom){
+    if(use_odom_){
         tf2_ros::Buffer tfbuffer(this->get_clock());
         tf2_ros::TransformListener listener(tfbuffer);
 
@@ -79,11 +84,11 @@ bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::
         scan2d.pose.calRmat();
     }
     else{
-        if(map == nullptr){
-            sf->process(scan2d);
-            map = sf->getPointCloudMap();
+        if(map_ == nullptr){
+            sf_->process(scan2d);
+            map_ = sf_->getPointCloudMap();
             }
-        Pose2D curPose = map->getLastPose();
+        Pose2D curPose = map_->getLastPose();
         scan2d.pose = curPose;
     }
 
@@ -101,12 +106,6 @@ bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::
     return true;
 }
 
-void Littleslam::scan_cb(const sensor_msgs::msg::LaserScan::SharedPtr scan)
-{   
-    Scan2D scan2d;
-    if (make_scan2d(scan2d, scan)) scan_buf.push_back(scan2d);
-}
-
 void Littleslam::broadcast_littleslam()
 {
         if (scan_buf.size() == 0) return;
@@ -114,42 +113,43 @@ void Littleslam::broadcast_littleslam()
         Scan2D scan2d = scan_buf.front();
         scan_buf.pop_front();
 
-        if (true) {
-            sf->process(scan2d);
-            map = sf->getPointCloudMap();
-    
-            PointCloud::Ptr msg(new PointCloud);
+        sf_->process(scan2d);
+        map_ = sf_->getPointCloudMap();
 
-            msg->header.frame_id = "map";
-            msg->height = msg->width = 1;
-            for (auto lp: map->globalMap) msg->points.push_back(pcl::PointXYZ(lp.x, lp.y, 0));
-            msg->width = msg->points.size();
-            pcl::toROSMsg (*msg, cloud);
-            icp_map_pub_->publish(cloud);
+        pcl::PointCloud<pcl::PointXYZ>::Ptr msg(new pcl::PointCloud<pcl::PointXYZ>);
+
+        msg->header.frame_id = "map";
+        msg->height = msg->width = 1;
+        for (auto lp: map_->globalMap) msg->points.push_back(pcl::PointXYZ(lp.x, lp.y, 0));
+        msg->width = msg->points.size();
+
+        sensor_msgs::msg::PointCloud2 cloud;
+        pcl::toROSMsg (*msg, cloud);
+        icp_map_pub_->publish(cloud);
             
-            nav_msgs::msg::Path path;
-            path.header.frame_id = "map";
-            for(auto p : map->poses) {
-                geometry_msgs::msg::PoseStamped pose;
-                pose.pose.position.x = p.tx;
-                pose.pose.position.y = p.ty;
-                pose.pose.position.z = 0;
-                tf2::Quaternion quat_tf;
-                quat_tf.setRPY(0.0, 0.0, DEG2RAD(p.th));
-                geometry_msgs::msg::Quaternion quat_msg;
-                quat_msg = tf2::toMsg(quat_tf);
-                pose.pose.orientation = quat_msg;
-                path.poses.push_back(pose);
-                if(p.tx == map->lastPose.tx && 
-                   p.ty == map->lastPose.ty && 
-                   p.th == map->lastPose.th){
+        nav_msgs::msg::Path path;
+        path.header.frame_id = "map";
+        for(auto pos : map_->poses) {
+            geometry_msgs::msg::PoseStamped pose;
+            pose.pose.position.x = pos.tx;
+            pose.pose.position.y = pos.ty;
+            pose.pose.position.z = 0;
+            tf2::Quaternion quat_tf;
+            quat_tf.setRPY(0.0, 0.0, DEG2RAD(pos.th));
+            geometry_msgs::msg::Quaternion quat_msg;
+            quat_msg = tf2::toMsg(quat_tf);
+            pose.pose.orientation = quat_msg;
+            path.poses.push_back(pose);
+            if(pos.tx == map_->lastPose.tx && 
+                   pos.ty == map_->lastPose.ty && 
+                   pos.th == map_->lastPose.th){
                     pose.header.frame_id = "map";
                     current_pose_pub_->publish(pose);
-                   }
-            }
-            
-            path_pub_->publish(path);
+               }
         }
+            
+        path_pub_->publish(path);
+
 }
 
 }// littleslam_ros2
