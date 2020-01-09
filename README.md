@@ -25,6 +25,12 @@ pub
 
 # Demo
 data:[ros.org Introduction to Working With Laser Scanner Data](http://wiki.ros.org/laser_pipeline/Tutorials/IntroductionToWorkingWithLaserScannerData)
+
+```
+ros2 run littleslam_ros2 littleslam_ros2 /scan:=/base_scan
+ros2 bag play -s rosbag_v2 Mapping1.bag
+```
+
 ![demo](./littleslam.png)  
 
 # Reference  
