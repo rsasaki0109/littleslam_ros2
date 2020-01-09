@@ -40,13 +40,10 @@ extern "C" {
 #endif
 
 #include <rclcpp/rclcpp.hpp>
-#include <boost/circular_buffer.hpp>
-#include <sstream>
 
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "nav_msgs/msg/path.hpp"
-
 
 #include "tf2/impl/utils.h"
 #include "tf2/convert.h"
