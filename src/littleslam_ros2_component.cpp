@@ -50,7 +50,7 @@ Littleslam::Littleslam()
 
     current_pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("curent_pose", 10);
 
-    timer_ = create_wall_timer(0.1s, std::bind(&Littleslam::broadcast_littleslam, this));
+    timer_ = create_wall_timer(0.001s, std::bind(&Littleslam::broadcast_littleslam, this));
 }
 
 bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::SharedPtr scan)
