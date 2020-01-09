@@ -37,7 +37,7 @@ Littleslam::Littleslam()
         [this](const typename sensor_msgs::msg::LaserScan::SharedPtr msg) -> void
         {
             Scan2D scan2d;
-            if (make_scan2d(scan2d, msg)) scan_buf.push_back(scan2d);
+            if (make_scan2d(scan2d, msg)) sf_->process(scan2d);
         };
     
     laser_sub_  = 
@@ -108,12 +108,6 @@ bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::
 
 void Littleslam::broadcast_littleslam()
 {
-        if (scan_buf.size() == 0) return;
-
-        Scan2D scan2d = scan_buf.front();
-        scan_buf.pop_front();
-
-        sf_->process(scan2d);
         map_ = sf_->getPointCloudMap();
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr msg(new pcl::PointCloud<pcl::PointXYZ>);
@@ -147,9 +141,7 @@ void Littleslam::broadcast_littleslam()
                     current_pose_pub_->publish(pose);
                }
         }
-            
         path_pub_->publish(path);
-
 }
 
 }// littleslam_ros2
