@@ -1,19 +1,11 @@
 #include "littleslam_ros2/littleslam_ros2_component.hpp"
 
-#include <rclcpp/rclcpp.hpp>
-
 #include <class_loader/register_macro.hpp>
 #include <chrono>
 #include <memory>
 
-#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
-
-#include <iostream>
-#include <sstream>
-
-boost::circular_buffer<Scan2D> scan_buf(10000);
 
 using namespace std::chrono_literals;
 
