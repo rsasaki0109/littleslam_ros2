@@ -29,6 +29,7 @@ include_directories(
   src/LittleSLAM/framework
   src/LittleSLAM/hook
   src/LittleSLAM/cui
+  src/LittleSLAM/p2o
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
