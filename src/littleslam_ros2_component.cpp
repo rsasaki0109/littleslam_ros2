@@ -37,7 +37,7 @@ Littleslam::Littleslam()
 
     path_pub_ = create_publisher<nav_msgs::msg::Path>("path", 10);
 
-    current_pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("curent_pose", 10);
+    current_pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("current_pose", 10);
 
     timer_ = create_wall_timer(100ms, [this]() { broadcast_littleslam(); });
 }
