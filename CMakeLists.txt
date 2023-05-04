@@ -67,6 +67,7 @@ target_link_libraries(${PROJECT_NAME}
   ${PCL_LIBRARIES}
   framework
   hook
+  p2o
 )
 
 ament_target_dependencies(${PROJECT_NAME}
