@@ -30,6 +30,7 @@ data:[ros.org Introduction to Working With Laser Scanner Data](http://wiki.ros.o
 ```
 ros2 run littleslam_ros2 littleslam_ros2 /scan:=/base_scan
 ros2 bag play -s rosbag_v2 Mapping1.bag
+rviz2 -d config/demo.rviz
 ```
 
 ![demo](./littleslam.png)  
