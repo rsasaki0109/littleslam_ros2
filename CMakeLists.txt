@@ -21,7 +21,6 @@ find_package (PCL 1.8 REQUIRED)
 add_subdirectory(./src/LittleSLAM/framework)
 add_subdirectory(./src/LittleSLAM/hook)
 add_subdirectory(./src/LittleSLAM/cui)
-add_subdirectory(./src/LittleSLAM/p2o)
 
 include_directories(
   include
@@ -30,7 +29,6 @@ include_directories(
   src/LittleSLAM/framework
   src/LittleSLAM/hook
   src/LittleSLAM/cui
-  src/LittleSLAM/p2o
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
@@ -67,15 +65,14 @@ target_link_libraries(${PROJECT_NAME}
   ${PCL_LIBRARIES}
   framework
   hook
-  p2o
 )
 
 ament_target_dependencies(${PROJECT_NAME}
-  rclcpp
-  sensor_msgs
-  tf2
+  rclcpp 
+  sensor_msgs 
+  tf2 
   tf2_ros
-  tf2_geometry_msgs
+  tf2_geometry_msgs   
 )
 
 install(TARGETS
