@@ -14,9 +14,7 @@ namespace littleslam_ros2
 
 Littleslam::Littleslam()
 : Node("littleslam")
-{ 
-
-    use_odom_ = false;
+{
 
     fc_.setSlamFrontEnd(sf_);
     fc_.makeFramework();
@@ -24,29 +22,28 @@ Littleslam::Littleslam()
         fc_.customizeI();
     }
     else fc_.customizeG();
-
     auto scan_callback =
         [this](const typename sensor_msgs::msg::LaserScan::SharedPtr msg) -> void
         {
             Scan2D scan2d;
             if (make_scan2d(scan2d, msg)) sf_->process(scan2d);
         };
-    
-    laser_sub_  = 
+
+    laser_sub_  =
             create_subscription<sensor_msgs::msg::LaserScan>("scan", 100,
                 scan_callback);
 
-    icp_map_pub_ = create_publisher<sensor_msgs::msg::PointCloud2>("icp_map", 10); 
+    icp_map_pub_ = create_publisher<sensor_msgs::msg::PointCloud2>("icp_map", 10);
 
     path_pub_ = create_publisher<nav_msgs::msg::Path>("path", 10);
 
     current_pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("curent_pose", 10);
 
-    timer_ = create_wall_timer(0.001s, std::bind(&Littleslam::broadcast_littleslam, this));
+    timer_ = create_wall_timer(100ms, [this]() { broadcast_littleslam(); });
 }
 
 bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::SharedPtr scan)
-{   
+{
 
     if(use_odom_){
         tf2_ros::Buffer tfbuffer(this->get_clock());
@@ -96,46 +93,47 @@ bool Littleslam::make_scan2d(Scan2D &scan2d, const sensor_msgs::msg::LaserScan::
     }
 
     return true;
+
 }
 
 void Littleslam::broadcast_littleslam()
 {
-        map_ = sf_->getPointCloudMap();
+    map_ = sf_->getPointCloudMap();
 
-        pcl::PointCloud<pcl::PointXYZ>::Ptr msg(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr msg(new pcl::PointCloud<pcl::PointXYZ>);
 
-        msg->header.frame_id = "map";
-        msg->height = msg->width = 1;
-        for (auto lp: map_->globalMap) msg->points.push_back(pcl::PointXYZ(lp.x, lp.y, 0));
-        msg->width = msg->points.size();
+    msg->header.frame_id = "map";
+    msg->height = msg->width = 1;
+    for (auto lp: map_->globalMap) msg->points.push_back(pcl::PointXYZ(lp.x, lp.y, 0));
+    msg->width = msg->points.size();
 
-        sensor_msgs::msg::PointCloud2 cloud;
-        pcl::toROSMsg (*msg, cloud);
-        icp_map_pub_->publish(cloud);
-            
-        nav_msgs::msg::Path path;
-        path.header.frame_id = "map";
-        for(auto pos : map_->poses) {
-            geometry_msgs::msg::PoseStamped pose;
-            pose.pose.position.x = pos.tx;
-            pose.pose.position.y = pos.ty;
-            pose.pose.position.z = 0;
-            tf2::Quaternion quat_tf;
-            quat_tf.setRPY(0.0, 0.0, DEG2RAD(pos.th));
-            geometry_msgs::msg::Quaternion quat_msg;
-            quat_msg = tf2::toMsg(quat_tf);
-            pose.pose.orientation = quat_msg;
-            path.poses.push_back(pose);
-            if(pos.tx == map_->lastPose.tx && 
-                   pos.ty == map_->lastPose.ty && 
-                   pos.th == map_->lastPose.th){
-                    pose.header.frame_id = "map";
-                    current_pose_pub_->publish(pose);
-               }
-        }
-        path_pub_->publish(path);
+    sensor_msgs::msg::PointCloud2 cloud;
+    pcl::toROSMsg (*msg, cloud);
+    icp_map_pub_->publish(cloud);
+
+    nav_msgs::msg::Path path;
+    path.header.frame_id = "map";
+    for(auto pos : map_->poses) {
+        geometry_msgs::msg::PoseStamped pose;
+        pose.pose.position.x = pos.tx;
+        pose.pose.position.y = pos.ty;
+        pose.pose.position.z = 0;
+        tf2::Quaternion quat_tf;
+        quat_tf.setRPY(0.0, 0.0, DEG2RAD(pos.th));
+        geometry_msgs::msg::Quaternion quat_msg;
+        quat_msg = tf2::toMsg(quat_tf);
+        pose.pose.orientation = quat_msg;
+        path.poses.push_back(pose);
+        if(pos.tx == map_->lastPose.tx &&
+                pos.ty == map_->lastPose.ty &&
+                pos.th == map_->lastPose.th){
+                pose.header.frame_id = "map";
+                current_pose_pub_->publish(pose);
+            }
+    }
+    path_pub_->publish(path);
 }
 
-}// littleslam_ros2
+}// namespace littleslam_ros2
 
 CLASS_LOADER_REGISTER_CLASS(littleslam_ros2::Littleslam, rclcpp::Node)
