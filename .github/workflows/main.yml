@@ -10,6 +10,8 @@ jobs:
             - name: ROS2 Install
               run: |
                   # Ref: https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+                  sudo apt-get update
+                  sudo apt-get install -y locales
                   sudo locale-gen en_US en_US.UTF-8
                   sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
                   export LANG=en_US.UTF-8
@@ -21,7 +23,7 @@ jobs:
                   source /opt/ros/foxy/setup.bash
             - uses: actions/checkout@v1
               with:
-                submodules: true
+                submodules: 'recursive'
             - name: Copy repository
               run: |
                   mkdir -p ~/ros2_ws/src/littleslam_ros2
