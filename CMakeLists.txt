@@ -68,11 +68,11 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 ament_target_dependencies(${PROJECT_NAME}
-  rclcpp 
-  sensor_msgs 
-  tf2 
+  rclcpp
+  sensor_msgs
+  tf2
   tf2_ros
-  tf2_geometry_msgs   
+  tf2_geometry_msgs
 )
 
 install(TARGETS
@@ -85,6 +85,11 @@ install(TARGETS
 install(TARGETS
   littleslam_ros2
   DESTINATION lib/${PROJECT_NAME}
+  )
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
   )
 
 ament_package()
