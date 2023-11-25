@@ -5,11 +5,11 @@ on: pull_request
 jobs:
     job1:
         name: Build
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         steps:
             - name: ROS2 Install
               run: |
-                  # Ref: https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+                  # Ref: https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html
                   sudo apt-get update
                   sudo apt-get install -y locales
                   sudo locale-gen en_US en_US.UTF-8
@@ -19,9 +19,9 @@ jobs:
                   curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
                   sudo sh -c 'echo "deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros2-latest.list'
                   sudo apt update
-                  sudo apt install ros-foxy-desktop
-                  source /opt/ros/foxy/setup.bash
-            - uses: actions/checkout@v1
+                  sudo apt install ros-humble-desktop
+                  source /opt/ros/humble/setup.bash
+            - uses: actions/checkout@v2
               with:
                 submodules: 'recursive'
             - name: Copy repository
@@ -30,25 +30,24 @@ jobs:
                   cp -rf . ~/ros2_ws/src/littleslam_ros2
             - name: Install dependencies
               run: |
-                  source /opt/ros/foxy/setup.bash
-                  sudo apt install -y python3-rosdep2
+                  source /opt/ros/humble/setup.bash
+                  sudo apt install -y python3-rosdep
                   rosdep update
                   cd ~/ros2_ws/src
                   rosdep install -r -y --from-paths . --ignore-src
             - name: Build packages
               run: |
-                  source /opt/ros/foxy/setup.bash
+                  source /opt/ros/humble/setup.bash
                   # Install colcon
-                  # Ref: https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/
+                  # Ref: https://docs.ros.org/en/humble/Tutorials/Colcon-Tutorial/
                   sudo apt install python3-colcon-common-extensions
                   cd ~/ros2_ws
                   colcon build
                   source ~/ros2_ws/install/setup.bash
             - name: Test packages
               run: |
-                  source /opt/ros/foxy/setup.bash
+                  source /opt/ros/humble/setup.bash
                   source ~/ros2_ws/install/setup.bash
                   cd ~/ros2_ws
                   colcon test
                   colcon test-result --verbose
-
