@@ -23,7 +23,7 @@ jobs:
                   source /opt/ros/foxy/setup.bash
             - uses: actions/checkout@v1
               with:
-                submodules: true
+                submodules: 'recursive'
             - name: Copy repository
               run: |
                   mkdir -p ~/ros2_ws/src/littleslam_ros2
