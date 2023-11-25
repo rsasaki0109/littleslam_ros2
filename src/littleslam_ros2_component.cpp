@@ -15,6 +15,10 @@ namespace littleslam_ros2
 Littleslam::Littleslam()
 : Node("littleslam")
 {
+    declare_parameter("use_odom", false);
+    get_parameter("use_odom", use_odom_);
+
+    RCLCPP_INFO(this->get_logger(), "use_odom: %d", use_odom_);
 
     fc_.setSlamFrontEnd(sf_);
     fc_.makeFramework();
@@ -134,6 +138,6 @@ void Littleslam::broadcast_littleslam()
     path_pub_->publish(path);
 }
 
-}// namespace littleslam_ros2
+} // namespace littleslam_ros2
 
 CLASS_LOADER_REGISTER_CLASS(littleslam_ros2::Littleslam, rclcpp::Node)
