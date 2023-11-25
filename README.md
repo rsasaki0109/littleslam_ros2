@@ -25,11 +25,11 @@ pub
 - nav_msgs::msg::PoseStamped ("current_pose")
 
 # Demo
-data:[ros.org Introduction to Working With Laser Scanner Data](http://wiki.ros.org/laser_pipeline/Tutorials/IntroductionToWorkingWithLaserScannerData)
+data:[ros.org Introduction to Working With Laser Scanner Data](http://wiki.ros.org/laser_pipeline/Tutorials/IntroductionToWorkingWithLaserScannerData) (using [rosbags](https://pypi.org/project/rosbags/))
 
 ```
 ros2 run littleslam_ros2 littleslam_ros2 /scan:=/base_scan
-ros2 bag play -s rosbag_v2 Mapping1.bag
+ros2 bag play Mapping1/
 rviz2 -d config/demo.rviz
 ```
 
