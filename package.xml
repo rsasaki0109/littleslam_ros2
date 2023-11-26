@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>The littleslam ros2 package</description>
 
-  <maintainer email="ryohei.sasaki@akane.waseda.jp">sasaki</maintainer>
+  <maintainer email="rsasaki0109@gmai.com">ryohei sasaki</maintainer>
 
   <license>MPL</license>
 
@@ -19,7 +19,7 @@
   <build_export_depend>rclcpp</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>pcl-conversions</build_export_depend>
-  
+
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>

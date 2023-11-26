@@ -17,7 +17,7 @@ ros2 run littleslam_ros2 littleslam_ros2
 # IO  
 sub  
 - sensor_msgs::msg::LaserScan ("scan")
-- odom (tf2 "base_link"->"odom")(optional,with use_odom:=true)  
+- odom (tf2 "base_link"->"odom")(optional,with use_odometry:=true)  
 
 pub  
 - sensor_msgs::msg::PointCloud2 ("icp_map")

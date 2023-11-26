@@ -16,6 +16,9 @@ Littleslam::Littleslam()
 : Node("littleslam")
 {
 
+    this->declare_parameter("use_odometry", false);
+    this->get_parameter("use_odometry", use_odom_);
+
     fc_.setSlamFrontEnd(sf_);
     fc_.makeFramework();
     if(use_odom_){
